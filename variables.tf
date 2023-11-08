@@ -47,8 +47,8 @@ variable "chkp-cloudguard-version" {
 }
 
 variable "chkp-scale-unit" {
-  type    = number
-  default = 2
+  type    = string
+  default = "2"
 }
 variable "chkp-bootstrap-script" {
   type    = string
@@ -72,7 +72,7 @@ variable "chkp-ssh-public-key" {
   default = ""
 }
 variable "chkp-bgp-asn" {
-  type    = number
+  type    = string
   default = "64512"
 }
 variable "chkp-nva-name" {
