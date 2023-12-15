@@ -15,7 +15,24 @@ resource "azurerm_virtual_hub" "tf-demo-vwan-hub" {
   location            = azurerm_resource_group.rg-tf-demo-vwan.location
   address_prefix      = var.vwan-address-prefix
   virtual_wan_id      = azurerm_virtual_wan.tf-demo-vwan.id
+  depends_on = [ azurerm_virtual_wan.tf-demo-vwan ]
+}
 
+data "azurerm_resources" "vwan-nva" {
+  resource_group_name = var.chkp-managed-app-rg-name
+  type = "Microsoft.Network/networkVirtualAppliances"
+  depends_on = [ azurerm_managed_application.tf-demo-ma-cpnva ]
+}
+
+resource "azurerm_virtual_hub_routing_intent" "tf-demo-routing-intent-to-internet" {
+  name = "InternetIntent"
+  virtual_hub_id = azurerm_virtual_hub.tf-demo-vwan-hub.id
+  routing_policy {
+    name         = "InternetTrafficPolicy"
+    destinations = ["Internet"]
+    next_hop = data.azurerm_resources.vwan-nva.resources[0].id
+  }
+  depends_on = [ data.azurerm_resources.vwan-nva ]
 }
 
 resource "azurerm_managed_application" "tf-demo-ma-cpnva" {
